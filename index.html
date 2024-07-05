@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      header {
+        text-align: center;
+        margin: 20px;
+      }
+      .art {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 5px;
+      }
+      .art img {
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Havarad Mueseum Info API</h1>
+      <h3>
+        Good Example use <strong>rabbit</strong> as title and
+        <strong>Paintings</strong> as a classification
+      </h3>
+      <p>
+        You can use a variety of titles and classifications when querying the
+        Harvard Art Museums API. Some examples of classifications include
+        "Paintings," "Sculpture," "Photographs," "Prints," "Drawings," and
+        "Textiles." For titles, you can use specific keywords such as "rabbit,"
+        "dog," "landscape," or any other term related to the art pieces you are
+        interested in.
+      </p>
+    </header>
+    <input type="text" id="title" placeholder="Title" />
+    <input type="text" id="classification" placeholder="Classification" />
+    <button onclick="fetchData()">Search</button>
+    <section>
+      <div id="result"></div>
+    </section>
+    <script>
+      function fetchData() {
+        const title = document.getElementById("title").value;
+        const classification = document.getElementById("classification").value;
+
+        const baseAPIEndpoint = "https://api.harvardartmuseums.org/object";
+        const apiKey = "28c3277e-8993-40e2-8cc3-fafc20cf8e04";
+
+        const queryString = `apikey=${encodeURIComponent(
+          apiKey
+        )}&title=${encodeURIComponent(
+          title
+        )}&classification=${encodeURIComponent(classification)}`;
+
+        const url = `${baseAPIEndpoint}?${queryString}`;
+        fetch(url)
+          .then((response) => response.json())
+          .then((data) => {
+            displayResults(data);
+            console.log(data);
+          })
+          .catch((error) => {
+            console.log("Error fetching data:", error);
+          });
+
+        const displayResults = (data) => {
+          const resultDiv = document.getElementById("result");
+          resultDiv.innerHTML = "";
+
+          data.records.forEach((record) => {
+            const artObj = document.createElement("div");
+            artObj.className = "art";
+
+            const title = record.title
+              ? `<h2>${record.title}</h2>`
+              : `<h2> Untitled </h2>`;
+            const classification = record.classification
+              ? `<p> Classification: ${record.classification} </p>`
+              : "";
+            const dated = record.dated ? `<p> Date: ${record.dated} </p>` : "";
+            const description = record.description
+              ? `<p>${record.description}</p>`
+              : "";
+            const imageUrl = record.imageUrl
+              ? `<img src = "${record.imageUrl}" alt = "${record.title}">`
+              : "";
+
+            artObj.innerHTML = `
+            ${title}
+            ${classification}
+            ${dated}
+            ${description}
+            ${imageUrl}
+            `;
+
+            resultDiv.appendChild(artObj);
+          });
+        };
+      }
+    </script>
+  </body>
+</html>
